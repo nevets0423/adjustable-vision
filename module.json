@@ -1,0 +1,20 @@
+{
+    "name": "adjustable-vision",
+    "title": "Adjustable Vision",
+    "description": "Swapable vision rules to quickly change how far a player can see",
+    "author": "nevets0423",
+    "version": "0.0.1",
+    "minimumCoreVersion": "0.8.9",
+    "compatibleCoreVersion": "0.8.9",
+    "scripts": [
+        "scripts/config.js"
+      ],
+      "styles": [
+          "styles/adjustableVision.css"
+      ],
+    "url": "https://github.com/nevets0423/adjustable-vision",
+    "manifest": "",
+    "download": "https://github.com/nevets0423/adjustable-vision/archive/refs/tags/v0.0.1.zip",
+    "changelog": "https://github.com/nevets0423/adjustable-vision/releases"
+  }
+  
