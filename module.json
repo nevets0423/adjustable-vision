@@ -13,8 +13,7 @@
           "styles/adjustableVision.css"
       ],
     "url": "https://github.com/nevets0423/adjustable-vision",
-    "manifest": "https://github.com/nevets0423/adjustable-vision/releases/download/v0.0.1/module.json",
-    "download": "https://github.com/nevets0423/adjustable-vision/archive/refs/tags/v0.0.1.zip",
-    "changelog": "https://github.com/nevets0423/adjustable-vision/releases"
+    "manifest": "https://github.com/nevets0423/adjustable-vision/releases/latest/download/module.json",
+    "download": "https://github.com/nevets0423/adjustable-vision/releases/latest/download/module.zip"
   }
   
