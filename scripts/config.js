@@ -31,6 +31,7 @@ const checkBoxInputRenderConfigTemplate = Handlebars.compile(`\
 const tokenHUDButtonTemplate = $(`<div class="control-icon avtoggle"><i class="adjustableVision-eye"></i></div>`);
 
 Hooks.on("init", RegisterGameSettings);
+Hooks.on("ready", SetupAllTokensAlreadyOnTheBoard);
 Hooks.on("createToken", SetDefaultTokenValues);
 Hooks.on("updateToken", UpdateToken);
 Hooks.on("renderTokenConfig", renderConfig);
@@ -49,6 +50,12 @@ function RegisterGlobalGameSetting(setting, name, hint, type, defaultValue){
     config: true,
     type: type,
     default: defaultValue
+  });
+}
+
+function SetupAllTokensAlreadyOnTheBoard(){
+  canvas.tokens.placeables.forEach(token => {
+    SetDefaultTokenValues(token, null, null)
   });
 }
 
@@ -100,20 +107,25 @@ function ToggleTokenHUDActive(active){
 
 function SetSightInfo(token, useAltVision){
   var document = token.data.document;
-  var change = {
-    brightSight: document.getFlag(moduleName, brightDistance), 
-    dimSight: document.getFlag(moduleName, dimDistance)
-  }
+  var change = CreateChangeSet(document.getFlag(moduleName, brightDistance), 0, document.getFlag(moduleName, dimDistance), 0);
 
   if(useAltVision){
-    change = {
-      brightSight: document.getFlag(moduleName, altBrightDistance), 
-      dimSight: document.getFlag(moduleName, altDimDistance)
-    }
+    change = CreateChangeSet(
+      document.getFlag(moduleName, altBrightDistance),
+      game.settings.get(moduleName, altBrightDistance),
+      document.getFlag(moduleName, altDimDistance), 
+      game.settings.get(moduleName, altDimDistance)
+    );
   }
-
   document.update(change);
   ToggleTokenHUDActive(useAltVision);
+}
+
+function CreateChangeSet(brightValue, brightDefault, dimValue, dimDefault){
+  return {
+    brightSight: (brightValue == null || brightValue == undefined) ? brightDefault : brightValue, 
+    dimSight: (dimValue == null || dimValue == undefined) ? dimDefault : dimValue
+  }
 }
 
 function renderConfig(sheet, html, data) {
@@ -124,10 +136,10 @@ function renderConfig(sheet, html, data) {
   let document = sheet.token;
   const numberInputConfig = numberInputRenderConfigTemplate({
     settings: [
-      CreateTokenConfigItem(moduleName, brightDistance, document, "Bright Vision", "Distance"),
-      CreateTokenConfigItem(moduleName, dimDistance, document, "Dim Vision", "Distance"),
-      CreateTokenConfigItem(moduleName, altDimDistance, document, "Alt Dim Vision", "Distance"),
-      CreateTokenConfigItem(moduleName, altBrightDistance, document, "Alt Bright Vision", "Distance")
+      CreateTokenConfigItem(moduleName, brightDistance, 0, document, "Bright Vision", "Distance"),
+      CreateTokenConfigItem(moduleName, dimDistance, 0, document, "Dim Vision", "Distance"),
+      CreateTokenConfigItem(moduleName, altDimDistance, game.settings.get(moduleName, altDimDistance), document, "Alt Dim Vision", "Distance"),
+      CreateTokenConfigItem(moduleName, altBrightDistance, game.settings.get(moduleName, altBrightDistance), document, "Alt Bright Vision", "Distance")
     ]
   }, {
       allowProtoMethodsByDefault: true,
@@ -136,7 +148,7 @@ function renderConfig(sheet, html, data) {
 
   const checkBoxConfig = checkBoxInputRenderConfigTemplate({
     settings: [
-      CreateTokenConfigItem(moduleName, useAltVision, document, "Use Alt Vision", null)
+      CreateTokenConfigItem(moduleName, useAltVision, false, document, "Use Alt Vision", null)
     ]
   }, {
       allowProtoMethodsByDefault: true,
@@ -150,11 +162,12 @@ function renderConfig(sheet, html, data) {
   $('input[name="brightSight"]').parent().hide();
 }
 
-function CreateTokenConfigItem(module, key, document, name, units){
+function CreateTokenConfigItem(module, key, _default, document, name, units){
+  var value = document.getFlag(module, key);
   return {
     module: module,
     key: key,
-    value: document.getFlag(module, key),
+    value: (value == null || value == undefined) ? _default : value,
     name: name,
     units: units
   };
